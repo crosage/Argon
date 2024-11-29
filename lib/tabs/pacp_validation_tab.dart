@@ -2,19 +2,16 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'dart:convert';
 import 'dart:io';
 
-class ActiveDetectionTab extends StatefulWidget {
+class PcapValidationTab extends StatefulWidget {
   final int index;
-  ActiveDetectionTab({Key? key, required this.index}) : super(key: key);
+  PcapValidationTab({Key? key, required this.index}) : super(key: key);
 
   @override
-  _ActiveDetectionTabState createState() => _ActiveDetectionTabState();
+  _PcapValidationTabState createState() => _PcapValidationTabState();
 }
 
-class _ActiveDetectionTabState extends State<ActiveDetectionTab> with AutomaticKeepAliveClientMixin<ActiveDetectionTab> {
-  TextEditingController interfaceController = TextEditingController();
-  TextEditingController dnsServerController = TextEditingController();
-  TextEditingController probeDomainController = TextEditingController();
-  TextEditingController probeIntervalController = TextEditingController();
+class _PcapValidationTabState extends State<PcapValidationTab> with AutomaticKeepAliveClientMixin<PcapValidationTab> {
+  TextEditingController folderController = TextEditingController();
   String commandOutput = "等待输出...";
 
   void updateCommandOutput(String output) {
@@ -23,16 +20,13 @@ class _ActiveDetectionTabState extends State<ActiveDetectionTab> with AutomaticK
     });
   }
 
-  Future<void> runActiveDetectionScript(String interface, String dnsServer, String probeDomain, int probeInterval) async {
+  Future<void> runPcapValidationScript(String folderPath) async {
     try {
       Process process = await Process.start(
         'python',
         [
-          "D:\\code\\dns\\lib\\python_scripts\\active_detection\\DNS_cli.py",
-          '--interface', interface,
-          '--dns-server', dnsServer,
-          '--probe-domain', probeDomain,
-          '--probe-interval', probeInterval.toString(),
+          "D:\\code\\dns\\lib\\python_scripts\\cross_validate\\cross_validate.py",
+          folderPath,
         ],
         runInShell: true,
         environment: {
@@ -62,49 +56,27 @@ class _ActiveDetectionTabState extends State<ActiveDetectionTab> with AutomaticK
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
+    super.build(context); // 需要调用super.build(context)
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              // 输入框
               TextBox(
-                controller: interfaceController,
-                placeholder: '请输入网络接口',
+                controller: folderController,
+                placeholder: '请输入pcap文件夹路径',
               ),
               SizedBox(height: 5),
-              TextBox(
-                controller: dnsServerController,
-                placeholder: '请输入DNS服务器',
-              ),
-              SizedBox(height: 5),
-              TextBox(
-                controller: probeDomainController,
-                placeholder: '请输入探测域名',
-              ),
-              SizedBox(height: 5),
-              TextBox(
-                controller: probeIntervalController,
-                placeholder: '请输入探测间隔时间',
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 5),
-
               FilledButton(
                 onPressed: () {
-                  String interface = interfaceController.text;
-                  String dnsServer = dnsServerController.text;
-                  String probeDomain = probeDomainController.text;
-                  int probeInterval = int.tryParse(probeIntervalController.text) ?? 5;
+                  String folderPath = folderController.text;
                   print("运行脚本");
-                  runActiveDetectionScript(interface, dnsServer, probeDomain, probeInterval);
+                  runPcapValidationScript(folderPath);
                 },
                 child: Text('运行脚本'),
               ),
               SizedBox(height: 20),
-
               Container(
                 padding: EdgeInsets.all(10),
                 height: 300,

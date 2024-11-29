@@ -231,12 +231,13 @@ class CrossValidation:
         return self.cname_table
 
     def get_domain_ip_table(self):
+        print("********33333333")
         for domain, ips in self.secure_domain_ip_table.items():
             print(f"Domain: {domain} with IPs: {ips}")
         return self.secure_domain_ip_table
 
 
-def main():
+if __name__=="__main__":
     if os.path.isdir(sys.argv[1]):
         if os.path.exists("security.pkl"):
             cross_validation = CrossValidation("security.pkl")

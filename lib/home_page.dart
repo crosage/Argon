@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dns/tabs/active_detection_tab.dart';
+import 'package:dns/tabs/pacp_validation_tab.dart';
 import 'package:fluent_ui/fluent_ui.dart' ;
 import 'dart:math';
 
@@ -28,10 +29,10 @@ class _MyHomePageState extends State<HomePage> {
         createTabForPassiveMonitoringScript();
         break;
       case 1:
-        createTabForActiveDetection();
+        createTabForActiveDetectionScript();
         break;
       case 2:
-        createTabForFileScript();
+        createTabForCrossValidateScript();
         break;
     }
   }
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<HomePage> {
     });
   }
 
-  void createTabForActiveDetection() {
+  void createTabForActiveDetectionScript() {
     setState(() {
       final newIndex = tabs.length;
       print("创建了一个主动探测$newIndex");
@@ -61,10 +62,10 @@ class _MyHomePageState extends State<HomePage> {
     });
   }
 
-  void createTabForFileScript() {
+  void createTabForCrossValidateScript() {
     setState(() {
       final newIndex = tabs.length;
-      tabs.add(generateTabForFile(newIndex)); // 创建文件管理 Tab
+      tabs.add(generateTabForCrossValidate(newIndex)); // 创建文件管理 Tab
       currentIndex = newIndex;
     });
   }
@@ -228,57 +229,16 @@ class _MyHomePageState extends State<HomePage> {
     );
   }
 
-  Tab generateTabForFile(int index) {
+  Tab generateTabForCrossValidate(int index) {
     return Tab(
       key: Key('tab_$index'),
-      text: Text('文件管理脚本'),
-      icon: Icon(FluentIcons.file_request),
-      body: Column(
-        children: [
-          Text('这是文件管理脚本的内容。'),
-          FilledButton(
-            onPressed: () {
-              print("运行文件管理脚本");
-              // 运行文件管理脚本的逻辑
-            },
-            child: Text('运行文件管理脚本'),
-          ),
-        ],
-      ),
+      text: Text('交叉验证'),
+      icon: Icon(FluentIcons.communication_details,color: Colors.orange.normal,),
+      body: PcapValidationTab(index: index), // 使用新的 StatefulWidget 组件
       onClosed: () {
         setState(() {
           tabs.removeAt(index);
-          if (tabs.isEmpty) {
-            currentIndex = 0;
-          } else if (currentIndex >= tabs.length) {
-            currentIndex = tabs.length - 1;
-          }
-        });
-      },
-    );
-  }
-
-// 默认 Tab 页面
-  Tab generateDefaultTab(int index) {
-    return Tab(
-      key: Key('tab_$index'),
-      text: Text('默认脚本'),
-      icon: Icon(FluentIcons.more),
-      body: Column(
-        children: [
-          Text('这是默认脚本的内容。'),
-          FilledButton(
-            onPressed: () {
-              print("运行默认脚本");
-              // 运行默认脚本的逻辑
-            },
-            child: Text('运行默认脚本'),
-          ),
-        ],
-      ),
-      onClosed: () {
-        setState(() {
-          tabs.removeAt(index);
+          commandOutputs.remove(index); // 移除对应tab的输出
           if (tabs.isEmpty) {
             currentIndex = 0;
           } else if (currentIndex >= tabs.length) {
