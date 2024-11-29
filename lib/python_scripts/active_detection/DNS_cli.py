@@ -3,7 +3,7 @@ import time
 import threading
 from scapy.layers.dns import DNS, DNSQR, DNSRR
 from scapy.layers.inet import IP, UDP
-from scapy.all import sniff, wrpcap, send, get_if_addr
+from scapy.all import sniff, wrpcap, send, get_if_addr,RandShort
 from collections import defaultdict
 from random import randint
 
@@ -65,8 +65,11 @@ def save_packets_to_pcap(i):
     """
     将捕获的数据包保存到PCAP文件
     """
-    print(f"[*] Saving {len(captured_packets)} packets to pcap file.")
-    wrpcap(f"captured_dns_packets_{i}.pcap", captured_packets)  # 保存为 PCAP 文件
+    # 设置保存的绝对路径
+    save_path = f"D:/code/dns/lib/python_scripts/active_detection/result/captured_dns_packets_{i}.pcap"
+
+    print(f"[*] Saving {len(captured_packets)} packets to pcap file: {save_path}")
+    wrpcap(save_path, captured_packets)  # 保存为 PCAP 文件
     captured_packets.clear()  # 清空列表，以便继续捕获新数据包
 
 def send_probe_query(dns_server_ip, probe_domain):
